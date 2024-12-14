@@ -89,9 +89,12 @@ export class Queue implements IQueue {
       transaction = await this.db.startTransaction();
       let id = await this.db.nextId(transaction);
       let task = new Task(this, id, data.topic || this.topic, data.params);
-      task.waiting = true;
+      if (data.topic && data.topic !== this.topic) {
+        task.stalled = true;
+      } else {
+        task.waiting = true;
+      }
       await this.db.onCreate(task, transaction);
-      await this.db.onWaiting(task, transaction);
       await this.db.endTransaction();
       this.callHooks(QueueEvent.waiting, null, task, null);
       return task;
@@ -118,12 +121,12 @@ export class Queue implements IQueue {
     let updates: ITask = {
       ...task,
       waiting: false,
+      stalled: false,
       locked: true,
+      completed: false,
     };
     try {
       transaction = await this.db.startTransaction();
-      await this.db.onLocked(updates, transaction);
-      await this.db.onRemoveWaiting(updates, transaction);
       await this.db.onUpdate(updates, transaction);
       await this.db.endTransaction();
       this.callHooks(QueueEvent.locked, null, task, null);
@@ -137,16 +140,15 @@ export class Queue implements IQueue {
     let transaction;
     let updates: ITask = {
       ...task,
+      waiting: false,
+      stalled: false,
       locked: false,
       completed: true,
       result: result,
     };
     try {
       transaction = await this.db.startTransaction();
-      task.completed = true;
-      await this.db.onRemoveLocked(updates, transaction);
-      await this.db.onCompleted(updates, transaction);
-      await this.db.onUpdate(task, transaction);
+      await this.db.onUpdate(updates, transaction);
       await this.db.endTransaction();
       this.callHooks(QueueEvent.completed, null, task, task.result);
     } catch (e) {
@@ -159,11 +161,14 @@ export class Queue implements IQueue {
     let transaction;
     let updates: ITask = {
       ...task,
+      waiting: false,
+      stalled: false,
+      locked: false,
+      completed: false,
       error: error.message,
     };
     try {
       transaction = await this.db.startTransaction();
-      await this.db.onFailed(updates, transaction);
       await this.db.onUpdate(updates, transaction);
       await this.db.endTransaction();
       this.callHooks(QueueEvent.failed, task.error, task, null);
