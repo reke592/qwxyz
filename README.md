@@ -53,7 +53,7 @@ Q.process({
 Then we add a queue by calling the `add` method that requires a Queueable data which then became a Task.
 
 - _params_ - required `Record<string, any>` to process by consumer
-- _topic_ - optional, this will insert a new record in database, considered pending other consumers.
+- _topic_ - optional, this will insert a new record in database, considered stalled or pending for other consumers.
 
 [Queueable](./src/types/dto.ts),
 [Task](./src/implementations/task.ts)
@@ -73,7 +73,7 @@ await Q.add({
 [QueueEventCallback](./src/interfaces/IQueue.ts)
 
 ```js
-// Instance hooks to subscribe on Queue instance->Consumer process
+// Instance hooks to subscribe on Queue instance
 Q.on(QueueEvent.waiting, (error, task, result) => {
   console.log(`topic: ${task.topic}, waiting: ${task.id}`);
 });
