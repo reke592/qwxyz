@@ -6,6 +6,7 @@ A Queue library with batch processing.
 
 - Test script and Scenarios
 - IQueueDb implementations for SQL/No-SQL databases
+- IPC channel support
 
 ### Usage
 
