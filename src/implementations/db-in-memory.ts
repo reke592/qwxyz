@@ -48,12 +48,15 @@ export class MemoryDb implements IQueueDb {
       this.waiting.add(task.id);
     } else if (task.stalled) {
       this.stalled.add(task.id);
+    } else {
+      throw new Error(`${task.tag} is not properly indexed.`);
     }
     this.records[task.id] = task;
   }
 
   async onUpdate(task: ITask, transaction: any): Promise<void> {
     this.debug("onUpdate", task.id);
+    // update index
     if (task.waiting) {
       this.waiting.add(task.id);
     } else if (task.locked) {
@@ -64,7 +67,10 @@ export class MemoryDb implements IQueueDb {
       this.completed.add(task.id);
     } else if (task.stalled) {
       this.stalled.add(task.id);
+    } else {
+      throw new Error(`${task.tag} is not properly indexed.`);
     }
+    // update
     this.records[task.id] = task;
   }
 
@@ -85,15 +91,5 @@ export class MemoryDb implements IQueueDb {
     this.debug("onDelete", topic, id);
     let key = QueueTag(topic, id);
     delete this.records[key];
-  }
-
-  async onRemoveWaiting(task: ITask, transaction: any): Promise<void> {
-    this.debug("onRemoveWaiting", task.id);
-    this.waiting.delete(task.id);
-  }
-
-  async onRemoveLocked(task: ITask, transaction: any): Promise<void> {
-    this.debug("onRemoveLocked", task.id);
-    this.locked.delete(task.id);
   }
 }
