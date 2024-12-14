@@ -5,3 +5,6 @@ export type Queueable = {
   topic?: Topic;
   params: TaskParams;
 };
+export function QueueTag(topic: Topic, id: TaskId) {
+  return `q:${topic}:${id}`;
+}

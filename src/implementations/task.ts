@@ -1,6 +1,6 @@
-import { TaskId, TaskParams, Topic } from "../types/dto";
-import { IQueue, ITask } from "../types/interface";
-import { hashKey } from "../utils/keys";
+import { QueueTag, TaskId, TaskParams, Topic } from "../types/dto";
+import { IQueue } from "../interfaces/IQueue";
+import { ITask } from "../interfaces/ITask";
 
 export class Task implements ITask {
   id: TaskId;
@@ -20,7 +20,7 @@ export class Task implements ITask {
     this.id = id;
     this.topic = topic;
     this.params = params;
-    this.tag = hashKey(topic, id);
+    this.tag = QueueTag(topic, id);
   }
 
   remove(): void {

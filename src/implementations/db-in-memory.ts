@@ -1,7 +1,7 @@
-import { TaskId, Topic } from "../types/dto";
+import { QueueTag, TaskId, Topic } from "../types/dto";
 import { Task } from "./task";
-import { IQueueDb, ITask } from "../types/interface";
-import { hashKey } from "../utils/keys";
+import { IQueueDb } from "../interfaces/IQueueDb";
+import { ITask } from "../interfaces/ITask";
 import { delay } from "../utils/delay";
 import { makeDebugger } from "../utils/debugger";
 
@@ -23,7 +23,7 @@ export class MemoryDb implements IQueueDb {
     let i = 0;
     for (let id of this.waiting) {
       let task = this.records[id];
-      if (task.tag === hashKey(topic, id)) {
+      if (task.tag === QueueTag(topic, id)) {
         results.push(task);
         if (++i === limit) break;
       }
@@ -80,7 +80,7 @@ export class MemoryDb implements IQueueDb {
 
   async onDelete(topic: Topic, id: TaskId, transaction: any): Promise<void> {
     this.debug("onDelete", topic, id);
-    let key = hashKey(topic, id);
+    let key = QueueTag(topic, id);
     delete this.records[key];
   }
   async onRemoveWaiting(task: ITask, transaction: any): Promise<void> {

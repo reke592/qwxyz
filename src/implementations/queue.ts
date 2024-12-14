@@ -1,14 +1,9 @@
 import { Queueable, Topic } from "../types/dto";
-import {
-  ConsumerProcessOptions,
-  IConsumer,
-  IQueue,
-  IQueueDb,
-  ITask,
-  QueueEvent,
-  QueueEventCallback,
-  QueueOptions,
-} from "../types/interface";
+import { QueueEvent } from "../types/enums";
+import { IQueueDb } from "../interfaces/IQueueDb";
+import { IQueue, QueueEventCallback, QueueOptions } from "../interfaces/IQueue";
+import { ConsumerProcessOptions, IConsumer } from "../interfaces/IConsumer";
+import { ITask } from "../interfaces/ITask";
 import { Consumer } from "./consumer";
 import { Task } from "./task";
 

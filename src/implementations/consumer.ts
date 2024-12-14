@@ -1,12 +1,10 @@
-import {
-  ConsumerProcessOptions,
-  DEFAULT_CHECK_INTERVAL,
-  IConsumer,
-  IQueue,
-  ITask,
-} from "../types/interface";
+import { IQueue } from "../interfaces/IQueue";
+import { ConsumerProcessOptions, IConsumer } from "../interfaces/IConsumer";
+import { ITask } from "../interfaces/ITask";
 import { makeDebugger } from "../utils/debugger";
 import { delay } from "../utils/delay";
+
+export const DEFAULT_CHECK_INTERVAL = 3000;
 
 export class Consumer implements IConsumer {
   private debug: debug.Debugger;
