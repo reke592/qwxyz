@@ -6,7 +6,7 @@ import { ITaskFields } from "./ITask";
  */
 
 export interface IQueueDb {
-  init(): Promise<IQueueDb>;
+  init(argv: any): Promise<IQueueDb>;
   startTransaction(): Promise<any>;
   endTransaction(error: any, transaction: any): Promise<void>;
   nextId(transaction: any): Promise<TaskId>;

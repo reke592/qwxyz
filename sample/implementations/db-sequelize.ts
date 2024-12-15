@@ -23,7 +23,7 @@ export class SequelizeDB implements IQueueDb {
     this.sequelize = sequelize;
   }
 
-  async init(): Promise<IQueueDb> {
+  async init(tableName?: string): Promise<IQueueDb> {
     QueueModel.init(
       {
         id: {
@@ -41,7 +41,7 @@ export class SequelizeDB implements IQueueDb {
         failed: DataTypes.BOOLEAN,
         error: DataTypes.STRING,
       },
-      { tableName: "queues", sequelize: this.sequelize }
+      { tableName: tableName || "queues", sequelize: this.sequelize }
     );
     await QueueModel.sync();
     return this;
