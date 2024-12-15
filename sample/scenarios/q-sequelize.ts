@@ -13,5 +13,5 @@ export async function start() {
     host: "localhost",
     port: 3306,
   });
-  scenario.start(await new SequelizeDB(connection).init());
+  scenario.start(await new SequelizeDB(connection).init("tbl_queues"));
 }
