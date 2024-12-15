@@ -1,17 +1,10 @@
 import * as readline from "readline";
 import { Scenario, Scenarios } from "./scenarios";
 
-// console.clear();
-console.table(Scenarios);
-
-let rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-let scene: Scenario;
-rl.question("Enter index to run the sample: ", async (answer) => {
-  scene = Scenarios[Number(answer)];
-  rl.close();
-  await scene.start();
-});
+const index = process.argv[2];
+if (!index) {
+  console.table(Scenarios);
+  console.log("To run scenarios: npm run dev <index>");
+} else {
+  Scenarios[Number(index)].start();
+}
