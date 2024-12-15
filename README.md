@@ -8,6 +8,11 @@ A Queue library with batch processing.
 - IQueueDb implementations for SQL/No-SQL databases
 - IPC channel support
 
+### Sample DB implementations
+
+- [MemoryDb](./src/implementations/db-in-memory.ts) - non-persistent storage. [sample](./sample/scenarios/q-consumer.ts)
+- [SequelizeDb](./sample/implementations/db-sequelize.ts) - has concurrency when using sqlite dialect. [sample](./sample/scenarios/q-sequelize.ts)
+
 ### Usage
 
 A Queue has a `topic` and `db` implementation
@@ -96,10 +101,6 @@ Queue.on(QueueEvent.locked, (error, task, result) => {
   console.log(`topic: ${task.topic}, locked: ${task.id}`);
 });
 ```
-
-### Supported DB
-
-- Memory
 
 ### Custom DB Implementation
 

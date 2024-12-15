@@ -16,8 +16,12 @@
   "author": "reke592",
   "license": "MIT",
   "devDependencies": {
+    "@sequelize/mysql": "^7.0.0-alpha.43",
+    "@sequelize/sqlite3": "^7.0.0-alpha.43",
     "@types/debug": "^4.1.12",
     "debug": "^4.4.0",
+    "mysql2": "^3.11.5",
+    "sqlite3": "^5.1.7",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.7.2"
