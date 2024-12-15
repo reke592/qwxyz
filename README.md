@@ -1,11 +1,11 @@
 ### QWXYZ
 
-A Queue library with batch processing.
+A queue library with batch processing. `Queue.getQueue` operates within a single transaction to lock tasks for processing by the consumer. The consumer uses atomic transactions for each task to ensure isolated commits and rollbacks. Task execution runs in parallel using `Promise.allSettled`.
 
 ### TODO
 
 - Test script and Scenarios
-- IQueueDb implementations for SQL/No-SQL databases
+- Pruning strategies
 - IPC channel support
 
 ### Sample DB implementations
