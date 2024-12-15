@@ -12,7 +12,7 @@ export class MemoryDb implements IQueueDb {
   next_id = 1;
   transaction: any = null;
   // row
-  records: Record<string, Task> = {};
+  records: Record<string, ITask> = {};
   // index
   waiting = new Set<TaskId>();
   locked = new Set<TaskId>();
@@ -20,8 +20,12 @@ export class MemoryDb implements IQueueDb {
   failed = new Set<TaskId>();
   completed = new Set<TaskId>();
 
-  async getQueues(topic: Topic, limit: number): Promise<ITask[]> {
-    this.debug("getQueues", topic, limit);
+  async getQueues(
+    topic: Topic,
+    limit: number,
+    transaction: any
+  ): Promise<ITask[]> {
+    this.debug(transaction, "getQueues", topic, limit);
     let results: ITask[] = [];
     let i = 0;
     for (let id of this.waiting) {
@@ -31,19 +35,19 @@ export class MemoryDb implements IQueueDb {
         if (++i === limit) break;
       }
     }
-    this.debug(results);
+    this.debug(transaction, `results`, results.length);
     return results;
   }
 
   async nextId(transaction: any): Promise<TaskId> {
-    this.debug("nextId", this.next_id);
+    this.debug(transaction, "nextId", this.next_id);
     let id = this.next_id;
     this.next_id++;
     return id;
   }
 
   async onCreate(task: ITask, transaction: any): Promise<void> {
-    this.debug("onCreate", task.id);
+    this.debug(transaction, "onCreate", task.id);
     if (task.waiting) {
       this.waiting.add(task.id);
     } else if (task.stalled) {
@@ -55,7 +59,7 @@ export class MemoryDb implements IQueueDb {
   }
 
   async onUpdate(task: ITask, transaction: any): Promise<void> {
-    this.debug("onUpdate", task.id);
+    this.debug(transaction, "onUpdate", task.id);
     // update index
     if (task.waiting) {
       this.waiting.add(task.id);
@@ -76,10 +80,11 @@ export class MemoryDb implements IQueueDb {
 
   async startTransaction(): Promise<any> {
     if (this.transaction) {
-      return await delay(() => this.startTransaction(), 0);
+      return await delay(async () => await this.startTransaction(), 100);
     }
     this.transaction = +new Date();
     this.debug("startTransaction", this.transaction);
+    return this.transaction;
   }
 
   async endTransaction(error: any): Promise<void> {
@@ -88,7 +93,7 @@ export class MemoryDb implements IQueueDb {
   }
 
   async onDelete(topic: Topic, id: TaskId, transaction: any): Promise<void> {
-    this.debug("onDelete", topic, id);
+    this.debug(transaction, "onDelete", topic, id);
     let key = QueueTag(topic, id);
     delete this.records[key];
   }

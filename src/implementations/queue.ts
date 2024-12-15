@@ -49,6 +49,7 @@ export class Queue implements IQueue {
   constructor(options: QueueOptions) {
     this.topic = options.topic;
     this.db = options.db;
+    this.allHooks = Queue.hooks;
     Queue.register(this);
   }
 
@@ -74,13 +75,25 @@ export class Queue implements IQueue {
   }
 
   async getQueues(limit: number): Promise<ITask[]> {
-    return await this.db
-      .getQueues(this.topic, limit)
-      .then(async (results) =>
-        results.map(
-          (record) => new Task(this, record.id, record.topic, record.params)
+    let transaction: any;
+    try {
+      transaction = await this.db.startTransaction();
+      let list = await this.db.getQueues(this.topic, limit, transaction);
+      let locked = await Promise.all(
+        list.map(
+          async (item) =>
+            await this.lock(item, transaction).then((value) => {
+              return new Task(this, value.id, value.topic, value.params);
+            })
         )
       );
+      await this.db.endTransaction();
+      locked.map((task) => this.callHooks(QueueEvent.locked, null, task, null));
+      return locked;
+    } catch (e) {
+      await this.db.endTransaction(e);
+      return [];
+    }
   }
 
   async add(data: Queueable): Promise<ITask> {
@@ -116,8 +129,7 @@ export class Queue implements IQueue {
     }
   }
 
-  async lock(task: ITask): Promise<void> {
-    let transaction;
+  async lock(task: ITask, transaction: any): Promise<ITask> {
     let updates: ITask = {
       ...task,
       waiting: false,
@@ -125,15 +137,12 @@ export class Queue implements IQueue {
       locked: true,
       completed: false,
     };
-    try {
-      transaction = await this.db.startTransaction();
-      await this.db.onUpdate(updates, transaction);
-      await this.db.endTransaction();
-      this.callHooks(QueueEvent.locked, null, task, null);
-    } catch (e) {
-      await this.db.endTransaction(e);
-      throw e;
+
+    if (!transaction) {
+      throw new Error("queue.lock needs a transaction");
     }
+    await this.db.onUpdate(updates, transaction);
+    return updates;
   }
 
   async complete(task: ITask, result: any): Promise<void> {
@@ -179,13 +188,7 @@ export class Queue implements IQueue {
   }
 
   async process(options: ConsumerProcessOptions): Promise<IConsumer> {
-    let handle;
-    if (typeof options.handler === "function") {
-      handle = options.handler;
-    } else {
-      handle = require(options.handler);
-    }
-    this.consumer = new Consumer(this, handle, options);
+    this.consumer = new Consumer(this, options);
     return this.consumer;
   }
 }

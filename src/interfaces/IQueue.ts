@@ -26,7 +26,9 @@ export interface IQueue {
    */
   db: IQueueDb;
   /**
-   * get queues
+   * @param topic
+   * @param limit
+   * @return a list of locked tasks
    */
   getQueues(limit: number): Promise<ITask[]>;
   /**
@@ -38,7 +40,7 @@ export interface IQueue {
    * lock task
    * @param task
    */
-  lock(task: ITask): Promise<void>;
+  lock(task: ITask, transaction: any): Promise<ITask>;
   /**
    * complete
    * @param task

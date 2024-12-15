@@ -1,6 +1,7 @@
 import { QueueTag, TaskId, TaskParams, Topic } from "../types/dto";
 import { IQueue } from "../interfaces/IQueue";
 import { ITask } from "../interfaces/ITask";
+import { IConsumer } from "../interfaces/IConsumer";
 
 export class Task implements ITask {
   id: TaskId;
@@ -12,8 +13,9 @@ export class Task implements ITask {
   locked: boolean = false;
   completed: boolean = false;
   error: any;
-  queue: IQueue;
   tag: string;
+  queue: IQueue;
+  consumerId?: number;
 
   constructor(queue: IQueue, id: TaskId, topic: Topic, params: TaskParams) {
     this.queue = queue;
@@ -25,10 +27,6 @@ export class Task implements ITask {
 
   remove(): void {
     this.queue.remove(this);
-  }
-
-  lock(): void {
-    this.queue.lock(this);
   }
 
   complete(result: any): void {

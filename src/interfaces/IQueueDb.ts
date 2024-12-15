@@ -13,5 +13,5 @@ export interface IQueueDb {
   onCreate(task: ITask, transaction: any): Promise<void>;
   onUpdate(task: ITask, transaction: any): Promise<void>;
   onDelete(topic: Topic, id: TaskId, transaction: any): Promise<void>;
-  getQueues(topic: Topic, limit: number): Promise<ITask[]>;
+  getQueues(topic: Topic, limit: number, transaction: any): Promise<ITask[]>;
 }

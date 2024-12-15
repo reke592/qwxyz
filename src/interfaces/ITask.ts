@@ -1,6 +1,6 @@
 import { TaskId, Topic, TaskParams } from "../types/dto";
+import { IConsumer } from "./IConsumer";
 import { IQueue } from "./IQueue";
-
 
 export interface ITask {
   id: TaskId;
@@ -12,9 +12,9 @@ export interface ITask {
   stalled: boolean;
   completed: boolean;
   error: any;
-  queue: IQueue;
   tag: string;
-  lock(): void;
+  queue: IQueue;
+  consumerId?: number;
   complete(result: any): void;
   failed(error: any): void;
   remove(): void;
