@@ -1,7 +1,12 @@
 import { DataTypes, Model, Sequelize, Transaction } from "@sequelize/core";
-import { IQueueDb } from "../../src/interfaces/IQueueDb";
-import { TaskId, TaskParams, Topic } from "../../src";
-import { ITask, ITaskFields } from "../../src/interfaces/ITask";
+import {
+  TaskId,
+  TaskParams,
+  Topic,
+  ITask,
+  ITaskFields,
+  IQueueDb,
+} from "../../src";
 
 class QueueModel extends Model implements ITaskFields {
   public id!: number;
