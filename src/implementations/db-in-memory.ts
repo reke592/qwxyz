@@ -74,6 +74,9 @@ export class MemoryDb implements IQueueDb {
       this.completed.add(task.id);
     } else if (task.stalled) {
       this.stalled.add(task.id);
+    } else if (task.failed) {
+      this.locked.delete(task.id);
+      this.failed.add(task.id);
     } else {
       throw new Error(`${task.tag} is not properly indexed.`);
     }

@@ -39,12 +39,12 @@ export class Consumer implements IConsumer {
     return await Promise.allSettled(
       tasks.map(async (task) => {
         task.consumerId = this.Id;
-        await this.handle(task)
+        return await this.handle(task)
           .then(async (result) => {
-            await task.complete(result);
+            return await task.complete(result);
           })
           .catch(async (error) => {
-            await task.fail(error);
+            return await task.fail(error);
           });
       })
     );

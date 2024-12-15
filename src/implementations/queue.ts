@@ -6,6 +6,7 @@ import { ConsumerProcessOptions, IConsumer } from "../interfaces/IConsumer";
 import { ITask, ITaskFields } from "../interfaces/ITask";
 import { Consumer } from "./consumer";
 import { Task } from "./task";
+import { delay } from "../utils/delay";
 
 export class Queue implements IQueue {
   static queues: IQueue[] = [];
@@ -26,6 +27,11 @@ export class Queue implements IQueue {
   static register(queue: IQueue) {
     Queue.queues.push(queue);
   }
+
+  /**
+   * prevents concurrency on getQueues when having multiple consumers
+   */
+  private lockGetQueues = false;
 
   private hooks: Record<QueueEvent, QueueEventCallback[]> = {
     [QueueEvent.waiting]: [],
@@ -75,6 +81,10 @@ export class Queue implements IQueue {
   }
 
   async getQueues(limit: number): Promise<ITask[]> {
+    if (this.lockGetQueues) {
+      return await delay(() => this.getQueues(limit), 100);
+    }
+    this.lockGetQueues = true;
     let transaction: any;
     try {
       transaction = await this.db.startTransaction();
@@ -93,6 +103,8 @@ export class Queue implements IQueue {
     } catch (e) {
       await this.db.endTransaction(e, transaction);
       return [];
+    } finally {
+      this.lockGetQueues = false;
     }
   }
 
@@ -157,7 +169,7 @@ export class Queue implements IQueue {
       topic: task.topic,
       error: task.error,
       params: task.params,
-      result: task.result,
+      result: result,
       waiting: false,
       stalled: false,
       locked: false,

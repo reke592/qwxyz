@@ -1,5 +1,6 @@
 import { Consumer, MemoryDb, Queue, QueueEvent } from "../../src";
 import { IQueueDb } from "../../src/interfaces/IQueueDb";
+import { delay } from "../../src/utils/delay";
 
 export const title = "Multiple consumers sharing a single Queue producer";
 
@@ -31,14 +32,18 @@ export async function start(db: IQueueDb) {
     autorun: true,
     batchSize: 3,
     async handler(task) {
-      throw new Error(`failed by consumer 1`);
+      await delay(() => {
+        throw new Error(`failed by consumer 1`);
+      }, 1000);
     },
   });
 
   const C2 = new Consumer(Q, {
     autorun: true,
     batchSize: 10,
-    async handler(task) {},
+    async handler(task) {
+      return await delay(() => "success", 1000);
+    },
   });
 
   await Promise.all(
