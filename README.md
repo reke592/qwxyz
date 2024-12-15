@@ -10,6 +10,8 @@ A Queue library with batch processing.
 
 ### Sample DB implementations
 
+To create a custom database, implement the [IQueueDb](./src/interfaces/IQueueDb.ts). Refer to the following examples below for guidance.
+
 - [MemoryDb](./src/implementations/db-in-memory.ts) - non-persistent storage. [sample](./sample/scenarios/q-consumer.ts)
 - [SequelizeDb](./sample/implementations/db-sequelize.ts) - has concurrency when using sqlite dialect. [sample](./sample/scenarios/q-sequelize.ts)
 
@@ -101,7 +103,3 @@ Queue.on(QueueEvent.locked, (error, task, result) => {
   console.log(`topic: ${task.topic}, locked: ${task.id}`);
 });
 ```
-
-### Custom DB Implementation
-
-To create a custom DB implement the [IQueueDb](./src/interfaces/IQueueDb.ts) you can refer to [MemoryDb](./src//implementations/db-in-memory.ts).
