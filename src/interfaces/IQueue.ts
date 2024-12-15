@@ -2,7 +2,7 @@ import { Topic, Queueable } from "../types/dto";
 import { QueueEvent } from "../types/enums";
 import { ConsumerProcessOptions, IConsumer } from "./IConsumer";
 import { IQueueDb } from "./IQueueDb";
-import { ITask } from "./ITask";
+import { ITask, ITaskFields } from "./ITask";
 
 export type QueueEventCallback = (
   error: any,
@@ -40,24 +40,24 @@ export interface IQueue {
    * lock task
    * @param task
    */
-  lock(task: ITask, transaction: any): Promise<ITask>;
+  lock(task: ITaskFields, transaction: any): Promise<ITaskFields>;
   /**
    * complete
    * @param task
    * @param result
    */
-  complete(task: ITask, result: any): Promise<void>;
+  complete(task: ITaskFields, result: any): Promise<void>;
   /**
    * failed task
    * @param task
    * @param error
    */
-  failed(task: ITask, error: Error): Promise<void>;
+  failed(task: ITaskFields, error: Error): Promise<void>;
   /**
    * remove task
    * @param task
    */
-  remove(task: ITask): Promise<void>;
+  remove(task: ITaskFields): Promise<void>;
   /**
    * start queue consumer
    * @param option
