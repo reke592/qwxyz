@@ -11,6 +11,7 @@ export class Task implements ITask {
   stalled: boolean = false;
   locked: boolean = false;
   completed: boolean = false;
+  failed: boolean = false;
   error: any;
   tag: string;
   queue: IQueue;
@@ -32,7 +33,7 @@ export class Task implements ITask {
     this.queue.complete(this, result);
   }
 
-  failed(error: any): void {
+  fail(error: any): void {
     this.queue.failed(this, error);
   }
 }

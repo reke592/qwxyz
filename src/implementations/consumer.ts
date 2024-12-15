@@ -44,7 +44,7 @@ export class Consumer implements IConsumer {
             await task.complete(result);
           })
           .catch(async (error) => {
-            await task.failed(error);
+            await task.fail(error);
           });
       })
     );

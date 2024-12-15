@@ -3,7 +3,7 @@ import { QueueEvent } from "../types/enums";
 import { IQueueDb } from "../interfaces/IQueueDb";
 import { IQueue, QueueEventCallback, QueueOptions } from "../interfaces/IQueue";
 import { ConsumerProcessOptions, IConsumer } from "../interfaces/IConsumer";
-import { ITask } from "../interfaces/ITask";
+import { ITask, ITaskFields } from "../interfaces/ITask";
 import { Consumer } from "./consumer";
 import { Task } from "./task";
 
@@ -87,11 +87,11 @@ export class Queue implements IQueue {
             })
         )
       );
-      await this.db.endTransaction();
+      await this.db.endTransaction(null, transaction);
       locked.map((task) => this.callHooks(QueueEvent.locked, null, task, null));
       return locked;
     } catch (e) {
-      await this.db.endTransaction(e);
+      await this.db.endTransaction(e, transaction);
       return [];
     }
   }
@@ -108,11 +108,11 @@ export class Queue implements IQueue {
         task.waiting = true;
       }
       await this.db.onCreate(task, transaction);
-      await this.db.endTransaction();
+      await this.db.endTransaction(null, transaction);
       this.callHooks(QueueEvent.waiting, null, task, null);
       return task;
     } catch (e) {
-      await this.db.endTransaction(e);
+      await this.db.endTransaction(e, transaction);
       throw e;
     }
   }
@@ -122,20 +122,25 @@ export class Queue implements IQueue {
     try {
       transaction = await this.db.startTransaction();
       await this.db.onDelete(task.topic, task.id, transaction);
-      await this.db.endTransaction();
+      await this.db.endTransaction(null, transaction);
     } catch (e) {
-      await this.db.endTransaction(e);
+      await this.db.endTransaction(e, transaction);
       throw e;
     }
   }
 
-  async lock(task: ITask, transaction: any): Promise<ITask> {
-    let updates: ITask = {
-      ...task,
+  async lock(task: ITaskFields, transaction: any): Promise<ITaskFields> {
+    let updates: ITaskFields = {
+      id: task.id,
+      topic: task.topic,
+      error: task.error,
+      params: task.params,
+      result: task.result,
       waiting: false,
       stalled: false,
       locked: true,
       completed: false,
+      failed: false,
     };
 
     if (!transaction) {
@@ -147,42 +152,50 @@ export class Queue implements IQueue {
 
   async complete(task: ITask, result: any): Promise<void> {
     let transaction;
-    let updates: ITask = {
-      ...task,
+    let updates: ITaskFields = {
+      id: task.id,
+      topic: task.topic,
+      error: task.error,
+      params: task.params,
+      result: task.result,
       waiting: false,
       stalled: false,
       locked: false,
       completed: true,
-      result: result,
+      failed: false,
     };
     try {
       transaction = await this.db.startTransaction();
       await this.db.onUpdate(updates, transaction);
-      await this.db.endTransaction();
+      await this.db.endTransaction(null, transaction);
       this.callHooks(QueueEvent.completed, null, task, task.result);
     } catch (e) {
-      await this.db.endTransaction(e);
+      await this.db.endTransaction(e, transaction);
       throw e;
     }
   }
 
   async failed(task: ITask, error: Error): Promise<void> {
     let transaction;
-    let updates: ITask = {
-      ...task,
+    let updates: ITaskFields = {
+      id: task.id,
+      topic: task.topic,
+      params: task.params,
+      result: task.result,
       waiting: false,
       stalled: false,
       locked: false,
       completed: false,
+      failed: true,
       error: error.message,
     };
     try {
       transaction = await this.db.startTransaction();
       await this.db.onUpdate(updates, transaction);
-      await this.db.endTransaction();
+      await this.db.endTransaction(null, transaction);
       this.callHooks(QueueEvent.failed, task.error, task, null);
     } catch (e) {
-      await this.db.endTransaction(e);
+      await this.db.endTransaction(e, transaction);
       throw e;
     }
   }

@@ -19,6 +19,10 @@ export class MemoryDb implements IQueueDb {
   failed = new Set<TaskId>();
   completed = new Set<TaskId>();
 
+  async init() {
+    return this;
+  }
+
   async getQueues(
     topic: Topic,
     limit: number,
@@ -28,7 +32,7 @@ export class MemoryDb implements IQueueDb {
     let results: ITask[] = [];
     let i = 0;
     for (let id of this.waiting) {
-      let task = this.records[id];
+      let task = this.records[id!];
       if (task.tag === QueueTag(topic, id)) {
         results.push(task);
         if (++i === limit) break;
@@ -54,7 +58,7 @@ export class MemoryDb implements IQueueDb {
     } else {
       throw new Error(`${task.tag} is not properly indexed.`);
     }
-    this.records[task.id] = task;
+    this.records[task.id!] = task;
   }
 
   async onUpdate(task: ITask, transaction: any): Promise<void> {
@@ -74,7 +78,7 @@ export class MemoryDb implements IQueueDb {
       throw new Error(`${task.tag} is not properly indexed.`);
     }
     // update
-    this.records[task.id] = task;
+    this.records[task.id!] = task;
   }
 
   async startTransaction(): Promise<any> {
