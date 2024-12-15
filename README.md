@@ -36,7 +36,7 @@ const Q = new Queue({
 });
 ```
 
-To initialize the Queue Consumer we need to call the `process` method with the following options.
+To initialize a Queue Consumer we need to call the `process` method with the following options.
 
 - _autorun_ - this will trigger the `consume` command every `checkInterval`
 - _checkInterval_ - in milliseconds defaults to 3s
@@ -56,6 +56,27 @@ Q.process({
     // return any result
   },
 });
+```
+
+We can also have multiple consumers sharing a single queue producer. This can be helpful when running consumers on different hosts or servers.
+
+```js
+// create consumers
+const C1 = new Consumer(Q, {
+  autorun: true,
+  batchSize: 3,
+  async handler(task) {},
+});
+
+const C2 = new Consumer(Q, {
+  autorun: true,
+  batchSize: 10,
+  async handler(task) {},
+});
+
+// start consumers
+C1.consume();
+C2.consume();
 ```
 
 Then we add a queue by calling the `add` method that requires a Queueable data which then became a Task.
