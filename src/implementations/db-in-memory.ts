@@ -1,5 +1,4 @@
 import { QueueTag, TaskId, Topic } from "../types/dto";
-import { Task } from "./task";
 import { IQueueDb } from "../interfaces/IQueueDb";
 import { ITask } from "../interfaces/ITask";
 import { delay } from "../utils/delay";

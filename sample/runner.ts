@@ -1,5 +1,4 @@
-import * as readline from "readline";
-import { Scenario, Scenarios } from "./scenarios";
+import { Scenarios } from "./scenarios";
 
 const index = process.argv[2];
 if (!index) {

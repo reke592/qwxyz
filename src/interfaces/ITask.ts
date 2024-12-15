@@ -1,5 +1,4 @@
 import { TaskId, Topic, TaskParams } from "../types/dto";
-import { IConsumer } from "./IConsumer";
 import { IQueue } from "./IQueue";
 
 export interface ITask {
