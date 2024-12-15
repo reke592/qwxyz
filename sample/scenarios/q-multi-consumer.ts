@@ -1,8 +1,9 @@
 import { Consumer, MemoryDb, Queue, QueueEvent } from "../../src";
+import { IQueueDb } from "../../src/interfaces/IQueueDb";
 
 export const title = "Multiple consumers sharing a single Queue producer";
 
-export async function start() {
+export async function start(db: IQueueDb) {
   Queue.on(QueueEvent.waiting, (error, task, result) => {
     console.log(`topic: ${task.topic}, waiting: #${task.id}`);
   });
@@ -14,8 +15,13 @@ export async function start() {
       `topic: ${task.topic}, completed: #${task.id}, by: consumer-${task.consumerId}`
     );
   });
+  Queue.on(QueueEvent.failed, (error, task, result) => {
+    console.log(
+      `topic: ${task.topic}, failed: #${task.id}, by: consumer-${task.consumerId}`
+    );
+  });
 
-  const DB = new MemoryDb();
+  const DB = db || new MemoryDb();
   const Q = new Queue({
     topic: "A",
     db: DB,
@@ -24,7 +30,9 @@ export async function start() {
   const C1 = new Consumer(Q, {
     autorun: true,
     batchSize: 3,
-    async handler(task) {},
+    async handler(task) {
+      throw new Error(`failed by consumer 1`);
+    },
   });
 
   const C2 = new Consumer(Q, {

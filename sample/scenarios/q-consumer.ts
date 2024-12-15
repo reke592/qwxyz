@@ -1,12 +1,13 @@
 import { MemoryDb, Queue, QueueEvent } from "../../src";
+import { IQueueDb } from "../../src/interfaces/IQueueDb";
 
 export const title = "Queue - Consumer";
 
-export async function start() {
-  const db = new MemoryDb();
+export async function start(db: IQueueDb) {
+  const DB = new MemoryDb();
   const a = new Queue({
     topic: "A",
-    db,
+    db: db || DB,
   });
 
   Queue.on(QueueEvent.waiting, (error, task, result) => {
