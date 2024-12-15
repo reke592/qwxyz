@@ -3,7 +3,6 @@ import {
   TaskId,
   TaskParams,
   Topic,
-  ITask,
   ITaskFields,
   IQueueDb,
 } from "../../src";
@@ -72,7 +71,7 @@ export class SequelizeDB implements IQueueDb {
     return null;
   }
 
-  async onCreate(task: ITask, transaction: any): Promise<void> {
+  async onCreate(task: ITaskFields, transaction: any): Promise<void> {
     await QueueModel.create(
       {
         // topic is permanent
@@ -90,7 +89,7 @@ export class SequelizeDB implements IQueueDb {
     );
   }
 
-  async onUpdate(task: ITask, transaction: any): Promise<void> {
+  async onUpdate(task: ITaskFields, transaction: any): Promise<void> {
     await QueueModel.update(
       {
         waiting: task.waiting,
