@@ -13,12 +13,12 @@ export async function start(db: IQueueDb) {
   });
   Queue.on(QueueEvent.completed, (error, task, result) => {
     console.log(
-      `topic: ${task.topic}, completed: #${task.id}, by: consumer-${task.consumerId}`
+      `topic: ${task.topic}, completed: #${task.id}, by: consumer-${task.consumerId}, result: ${result}`
     );
   });
   Queue.on(QueueEvent.failed, (error, task, result) => {
     console.log(
-      `topic: ${task.topic}, failed: #${task.id}, by: consumer-${task.consumerId}`
+      `topic: ${task.topic}, failed: #${task.id}, by: consumer-${task.consumerId}, error: ${error}`
     );
   });
 

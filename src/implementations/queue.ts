@@ -180,7 +180,7 @@ export class Queue implements IQueue {
       transaction = await this.db.startTransaction();
       await this.db.onUpdate(updates, transaction);
       await this.db.endTransaction(null, transaction);
-      this.callHooks(QueueEvent.completed, null, task, task.result);
+      this.callHooks(QueueEvent.completed, null, task, result);
     } catch (e) {
       await this.db.endTransaction(e, transaction);
       throw e;
@@ -205,7 +205,7 @@ export class Queue implements IQueue {
       transaction = await this.db.startTransaction();
       await this.db.onUpdate(updates, transaction);
       await this.db.endTransaction(null, transaction);
-      this.callHooks(QueueEvent.failed, task.error, task, null);
+      this.callHooks(QueueEvent.failed, error, task, null);
     } catch (e) {
       await this.db.endTransaction(e, transaction);
       throw e;

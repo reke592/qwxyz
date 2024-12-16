@@ -86,7 +86,7 @@ export class MemoryDb implements IQueueDb {
 
   async startTransaction(): Promise<any> {
     if (this.transaction) {
-      return await delay(async () => await this.startTransaction(), 100);
+      return await delay(async () => await this.startTransaction(), 0);
     }
     this.transaction = +new Date();
     this.debug("startTransaction", this.transaction);
