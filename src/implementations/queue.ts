@@ -8,6 +8,9 @@ import { Consumer } from "./consumer";
 import { Task } from "./task";
 import { delay } from "../utils/delay";
 
+/**
+ * Queue producer
+ */
 export class Queue implements IQueue {
   static queues: IQueue[] = [];
   static hooks: Record<QueueEvent, QueueEventCallback[]> = {

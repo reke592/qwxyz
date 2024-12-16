@@ -24,11 +24,33 @@ export type ConsumerProcessOptions = {
 };
 
 export interface IConsumer {
+  /**
+   * @return {number} consumer id
+   */
   get Id(): number;
+  /**
+   * a flag that throttles the `consume` method
+   */
   running: boolean;
+  /**
+   * consumer process options to control the consumer behavior
+   */
   options: ConsumerProcessOptions;
+  /**
+   * the Queue instance to consume
+   */
   queue: IQueue;
+  /**
+   * equivalent to this consumer options.handler
+   */
   handle: ConsumerHander;
+  /**
+   * run tasks in parallel using `Promise.allSettled`
+   * @param tasks
+   */
   handleBulk(tasks: ITask[]): Promise<any[]>;
-  consume(batchSize?: number): Promise<void>;
+  /**
+   * start requesting queues
+   */
+  consume(): Promise<void>;
 }

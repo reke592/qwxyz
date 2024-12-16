@@ -10,6 +10,9 @@ import { delay } from "../utils/delay";
 
 export const DEFAULT_CHECK_INTERVAL = 3000;
 
+/**
+ * Queue consumer
+ */
 export class Consumer implements IConsumer {
   private static nextId = 1;
   private debug: debug.Debugger;

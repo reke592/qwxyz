@@ -11,11 +11,21 @@ export type QueueEventCallback = (
 ) => Promise<void> | void;
 
 export type QueueOptions = {
+  /**
+   * topic of the queue
+   */
   topic: Topic;
+  /**
+   * database implementation where to save the records.
+   * @see ITaskFields
+   */
   db: IQueueDb;
 };
 
 export interface IQueue {
+  /**
+   * the topic of this producer
+   */
   topic: Topic;
   /**
    * consumer implementation
@@ -28,7 +38,7 @@ export interface IQueue {
   /**
    * @param topic
    * @param limit
-   * @return a list of locked tasks
+   * @returns a list of locked tasks
    */
   getQueues(limit: number): Promise<ITask[]>;
   /**
@@ -63,6 +73,14 @@ export interface IQueue {
    * @param option
    */
   process(option: ConsumerProcessOptions): Promise<IConsumer>;
+  /**
+   * register hooks to this instance, for global hooks use the static `Queue.on`
+   * @param event
+   * @param callback
+   */
   on(event: QueueEvent, callback: QueueEventCallback): IQueue;
+  /**
+   * re-compute, allHooks = hooks + Queue.hooks
+   */
   recomputeHooks(event: QueueEvent): void;
 }

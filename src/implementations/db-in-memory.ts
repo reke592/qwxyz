@@ -4,6 +4,10 @@ import { ITask } from "../interfaces/ITask";
 import { delay } from "../utils/delay";
 import { makeDebugger } from "../utils/debugger";
 
+/**
+ * in-memory database implementation for Queue task storage
+ * @see IQueueDb
+ */
 export class MemoryDb implements IQueueDb {
   private debug = makeDebugger("db:in-memory");
 

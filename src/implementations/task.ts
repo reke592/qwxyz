@@ -2,6 +2,9 @@ import { QueueTag, TaskId, TaskParams, Topic } from "../types/dto";
 import { IQueue } from "../interfaces/IQueue";
 import { ITask } from "../interfaces/ITask";
 
+/**
+ * Task for Queue consumers
+ */
 export class Task implements ITask {
   id: TaskId;
   topic: Topic;

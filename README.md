@@ -15,6 +15,12 @@ To create a custom database, implement the [IQueueDb](./src/interfaces/IQueueDb.
 - [MemoryDb](./src/implementations/db-in-memory.ts) - non-persistent storage. [sample](./sample/scenarios/q-consumer.ts)
 - [SequelizeDb](./sample/implementations/db-sequelize.ts) - has concurrency when using sqlite dialect. [sample](./sample/scenarios/q-sequelize.ts)
 
+### Installation
+
+```sh
+npm i @reke592/qwxyz
+```
+
 ### Usage
 
 A Queue has a `topic` and `db` implementation
