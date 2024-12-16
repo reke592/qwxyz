@@ -62,6 +62,7 @@ export class Queue implements IQueue {
   on(event: QueueEvent, callback: QueueEventCallback): IQueue {
     this.hooks[event] = this.hooks[event] || [];
     this.hooks[event].push(callback);
+    this.recomputeHooks(event);
     return this;
   }
 

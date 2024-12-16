@@ -5,27 +5,27 @@ import { delay } from "../../src/utils/delay";
 export const title = "Multiple consumers sharing a single Queue producer";
 
 export async function start(db: IQueueDb) {
+  const DB = db || new MemoryDb();
+  const Q = new Queue({
+    topic: "A",
+    db: DB,
+  });
+
   Queue.on(QueueEvent.waiting, (error, task, result) => {
     console.log(`topic: ${task.topic}, waiting: #${task.id}`);
   });
   Queue.on(QueueEvent.locked, (error, task, result) => {
     console.log(`topic: ${task.topic}, locked: #${task.id}`);
   });
-  Queue.on(QueueEvent.completed, (error, task, result) => {
+  Q.on(QueueEvent.completed, (error, task, result) => {
     console.log(
       `topic: ${task.topic}, completed: #${task.id}, by: consumer-${task.consumerId}, result: ${result}`
     );
   });
-  Queue.on(QueueEvent.failed, (error, task, result) => {
+  Q.on(QueueEvent.failed, (error, task, result) => {
     console.log(
       `topic: ${task.topic}, failed: #${task.id}, by: consumer-${task.consumerId}, error: ${error}`
     );
-  });
-
-  const DB = db || new MemoryDb();
-  const Q = new Queue({
-    topic: "A",
-    db: DB,
   });
 
   const C1 = new Consumer(Q, {
