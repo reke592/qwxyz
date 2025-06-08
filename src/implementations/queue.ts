@@ -105,7 +105,7 @@ export class Queue implements IQueue {
       locked.map((task) => this.callHooks(QueueEvent.locked, null, task, null));
       return locked;
     } catch (e) {
-      await this.db.endTransaction(e, transaction);
+      await this.db.endTransaction(e, transaction).catch(console.error);
       return [];
     } finally {
       this.lockGetQueues = false;
