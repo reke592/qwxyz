@@ -7,7 +7,7 @@ import {
   IQueueDb,
 } from "../../src";
 
-class QueueModel extends Model implements ITaskFields {
+export class QueueModel extends Model implements ITaskFields {
   public id!: number;
   public topic!: string;
   public params!: TaskParams;
@@ -18,6 +18,9 @@ class QueueModel extends Model implements ITaskFields {
   public completed!: boolean;
   public failed!: boolean;
   public error: any;
+  public retries!: number; // default value for retries
+  public date_created?: string;
+  public date_modified?: string;
 }
 
 export class SequelizeDB implements IQueueDb {
@@ -44,8 +47,31 @@ export class SequelizeDB implements IQueueDb {
         completed: DataTypes.BOOLEAN,
         failed: DataTypes.BOOLEAN,
         error: DataTypes.STRING,
+        retries: {
+          type: DataTypes.INTEGER.UNSIGNED,
+          defaultValue: 0,
+          allowNull: false,
+        },
+        date_created: {
+          type: DataTypes.STRING,
+          get() {
+            return new Date(this.getDataValue("date_created"));
+          },
+          set(value: Date) {
+            this.setDataValue("date_created", value.toISOString());
+          },
+        },
+        date_modified: {
+          type: DataTypes.STRING,
+          get() {
+            return new Date(this.getDataValue("date_modified"));
+          },
+          set(value: Date) {
+            this.setDataValue("date_modified", value.toISOString());
+          },
+        },
       },
-      { tableName: tableName || "queues", sequelize: this.sequelize }
+      { tableName: tableName || "queues", sequelize: this.sequelize, timestamps: false }
     );
     await QueueModel.sync();
     return this;
@@ -84,6 +110,7 @@ export class SequelizeDB implements IQueueDb {
         params: task.params,
         result: task.result,
         error: task.error,
+        date_created: new Date(),
       },
       { transaction }
     );
@@ -100,6 +127,7 @@ export class SequelizeDB implements IQueueDb {
         params: task.params,
         result: task.result,
         error: task.error,
+        date_modified: new Date(),
       },
       {
         where: {
