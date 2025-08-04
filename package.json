@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx ts-node-dev --respawn ./sample/runner.ts",
+    "dev": "npx ts-node-dev --inspect --respawn ./sample/runner.ts",
     "emitted": "npx tsc --listFiles --listEmittedFiles",
     "debug": "SET DEBUG=qwxyz* && npx ts-node-dev --respawn ./sample/runner.ts",
     "clean": "rimraf dist",

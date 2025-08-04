@@ -21,6 +21,8 @@ export class Consumer implements IConsumer {
   queue: IQueue;
   options: ConsumerProcessOptions;
   running: boolean = false;
+  shuttingdown: boolean = false;
+  interval?: NodeJS.Timeout;
   handle: ConsumerHander;
 
   constructor(queue: IQueue, options: ConsumerProcessOptions) {
@@ -30,7 +32,24 @@ export class Consumer implements IConsumer {
     this.options = options;
     this.handle = this.options.handler!;
     if (this.options.autorun) {
-      this.consume();
+      // this.consume();
+      this.interval = setInterval(async () => {
+        await this.consume();
+      }, this.options.checkInterval || DEFAULT_CHECK_INTERVAL);
+      process.on("SIGINT", this.shutdown.bind(this));
+      process.on("SIGTERM", this.shutdown.bind(this));
+    }
+  }
+
+  async shutdown(): Promise<void> {
+    this.shuttingdown = true;
+    console.warn(`consumer#${this.id}:${this.queue.topic}: shutdown in progress.`);
+    while (this.running) {
+      console.warn(`consumer#${this.id}:${this.queue.topic}: waiting for running process.`);
+      await delay(100);
+    }
+    if (this.interval) {
+      clearInterval(this.interval);
     }
   }
 
@@ -54,7 +73,7 @@ export class Consumer implements IConsumer {
   }
 
   async consume(): Promise<void> {
-    if (this.running) return;
+    if (this.running || this.shuttingdown) return;
     this.running = true;
     this.debug("check waiting");
     let tasks = await this.queue.getQueues(this.options.batchSize);
@@ -62,17 +81,18 @@ export class Consumer implements IConsumer {
       this.debug(`consume count: ${tasks.length}`);
       await this.handleBulk(tasks);
       this.running = false;
-      if (this.options.autorun) {
-        await delay(async () => await this.consume(), 100);
-      }
+      await this.consume();
+      // if (this.options.autorun) {
+      //   await delay(async () => await this.consume(), 100);
+      // }
     } else {
       this.running = false;
-      if (this.options.autorun) {
-        await delay(
-          async () => await this.consume(),
-          this.options.checkInterval || DEFAULT_CHECK_INTERVAL
-        );
-      }
+      // if (this.options.autorun) {
+      //   await delay(
+      //     async () => await this.consume(),
+      //     this.options.checkInterval || DEFAULT_CHECK_INTERVAL
+      //   );
+      // }
     }
   }
 }

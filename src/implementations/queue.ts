@@ -85,8 +85,9 @@ export class Queue implements IQueue {
   }
 
   async getQueues(limit: number): Promise<ITask[]> {
-    if (this.lockGetQueues) {
-      return await delay(() => this.getQueues(limit), 100);
+    while (this.lockGetQueues) {
+      await delay(100);
+      // return await delay(() => this.getQueues(limit), 100);
     }
     this.lockGetQueues = true;
     let transaction: any;

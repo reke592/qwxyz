@@ -32,9 +32,11 @@ export async function start(db: IQueueDb) {
     autorun: true,
     batchSize: 3,
     async handler(task) {
-      await delay(() => {
-        throw new Error(`failed by consumer 1`);
-      }, 1000);
+      await delay(1000);
+      throw new Error(`failed by consumer 1`);
+      // await delay(() => {
+      //   throw new Error(`failed by consumer 1`);
+      // }, 1000);
     },
   });
 
@@ -42,7 +44,9 @@ export async function start(db: IQueueDb) {
     autorun: true,
     batchSize: 10,
     async handler(task) {
-      return await delay(() => "success", 1000);
+      await delay(1000);
+      return "success";
+      // return await delay(() => "success", 1000);
     },
   });
 

@@ -41,6 +41,14 @@ export interface IConsumer {
    */
   queue: IQueue;
   /**
+   * autorun interval
+   */
+  interval?: NodeJS.Timeout;
+  /**
+   * flag when shutting down
+   */
+  shuttingdown: boolean;
+  /**
    * equivalent to this consumer options.handler
    */
   handle: ConsumerHander;
@@ -53,4 +61,8 @@ export interface IConsumer {
    * start requesting queues
    */
   consume(): Promise<void>;
+  /**
+   * teardown consumer
+   */
+  shutdown(): Promise<void>;
 }

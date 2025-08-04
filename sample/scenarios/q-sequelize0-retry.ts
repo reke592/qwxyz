@@ -59,9 +59,11 @@ export async function start() {
     autorun: true,
     batchSize: 1,
     async handler(task) {
-      await delay(() => {
-        throw new Error(`failed by consumer 1`);
-      }, 1000);
+      await delay(1000);
+      throw new Error(`failed by consumer 1`);
+      // await delay(() => {
+      //   throw new Error(`failed by consumer 1`);
+      // }, 1000);
     },
   });
 
